@@ -1,0 +1,154 @@
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Button, Text, StyleSheet, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const ConfigScreen = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [birthdate, setBirthdate] = useState('');
+  const [isDataChanged, setIsDataChanged] = useState(false);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const storedName = await AsyncStorage.getItem('name');
+      const storedEmail = await AsyncStorage.getItem('email');
+      const storedBirthdate = await AsyncStorage.getItem('birthdate');
+
+      if (storedName !== null) {
+        setName(storedName);
+      }
+
+      if (storedEmail !== null) {
+        setEmail(storedEmail);
+      }
+
+      if (storedBirthdate !== null) {
+        setBirthdate(storedBirthdate);
+      }
+    } catch (error) {
+      console.log('Error retrieving data:', error);
+    }
+  };
+
+  useEffect(() => {
+    const checkIfDataChanged = () => {
+      if (name.trim() !== '' || email.trim() !== '' || birthdate.trim() !== '') {
+        setIsDataChanged(true);
+      } else {
+        setIsDataChanged(false);
+      }
+    };
+
+    checkIfDataChanged();
+  }, [name, email, birthdate]);
+
+  const formatBirthdate = (value) => {
+    let formattedValue = value.replace(/\//g, '');
+    if (formattedValue.length > 2) {
+      formattedValue = `${formattedValue.slice(0, 2)}/${formattedValue.slice(2)}`;
+    }
+    if (formattedValue.length > 5) {
+      formattedValue = `${formattedValue.slice(0, 5)}/${formattedValue.slice(5)}`;
+    }
+    return formattedValue;
+  };
+
+  const handleBirthdateChange = (value) => {
+    const formattedValue = formatBirthdate(value);
+    setBirthdate(formattedValue);
+  };
+
+  const saveData = async () => {
+    if (!name || !email || !birthdate) {
+      Alert.alert(
+        'Campos Vazios',
+        'Por favor, preencha todas as informações para concluir esta ação.'
+      );
+      return;
+    }
+
+    try {
+      const storedName = await AsyncStorage.getItem('name');
+      const storedEmail = await AsyncStorage.getItem('email');
+      const storedBirthdate = await AsyncStorage.getItem('birthdate');
+
+      if (
+        name.trim() === storedName?.trim() &&
+        email.trim() === storedEmail?.trim() &&
+        birthdate.trim() === storedBirthdate?.trim()
+      ) {
+        Alert.alert('Informações Iguais', 'As informações são iguais às que foram localmente salvas.');
+        return;
+      }
+
+      await AsyncStorage.setItem('name', name);
+      await AsyncStorage.setItem('email', email);
+      await AsyncStorage.setItem('birthdate', birthdate);
+
+      setIsDataChanged(false);
+
+      Alert.alert(
+        'Informações Salvas',
+        'Suas informações foram salvas com sucesso. Seus chamados agora serão atualizados e informados no e-mail providenciado.'
+      );
+    } catch (error) {
+      console.log('Error saving data:', error);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.label}>Nome:</Text>
+      <TextInput
+        style={styles.input}
+        value={name}
+        onChangeText={setName}
+        placeholder="Digite seu nome"
+      />
+
+      <Text style={styles.label}>Email:</Text>
+      <TextInput
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Digite seu email"
+      />
+
+      <Text style={styles.label}>Data de Nascimento:</Text>
+      <TextInput
+        style={styles.input}
+        value={birthdate}
+        onChangeText={handleBirthdateChange}
+        placeholder="DD/MM/AAAA"
+      />
+
+      <Button title="Salvar" onPress={saveData} disabled={!isDataChanged || !name || !email || !birthdate} />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  input: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+});
+
+export default ConfigScreen;
