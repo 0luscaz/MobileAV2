@@ -1,0 +1,57 @@
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
+import { Text, View, Button, StyleSheet } from "react-native";
+
+export default function Home(){
+
+    const passar = useNavigation();
+
+    function aba(){
+        passar.navigate('ConfigScreen');
+    };
+
+    function obo(){
+        passar.navigate('Criar');
+    };
+
+    
+    return(
+    <View style={styles.container}>
+        <View>
+        <Text style={styles.texto}>Bem vindo a Home da central de atendimento e chamados.ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤSelecione a opção mais adequada a sua necessidade abaixo.</Text>
+        </View>
+        <View style={styles.button}>
+    <Button title="criar chamado. " 
+        onPress={obo}/>
+        </View>
+    <View style={styles.button1}>
+    <Button title="Configurações. " 
+        onPress={aba}/>
+    </View>
+    </View>
+    );
+}
+
+const styles = StyleSheet.create({
+
+    container: {
+        flex: 1,
+        backgroundColor:'#fff',
+    },
+    texto: {
+        fontSize: 20,
+        marginTop: 50,
+        marginBottom:65,
+    },
+    button: {
+        backgroundColor: '#fff',
+        padding: 10,
+        marginBottom: 20,
+    },
+    button1: {
+        backgroundColor: '#fff',
+        padding: 10,
+        marginTop: 20,
+    },
+
+});
